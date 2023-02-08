@@ -1,0 +1,30 @@
+version: "3"
+services:
+  amqp:
+    image: rabbitmq:3.9.11-management-alpine
+    ports:
+      - 15672:15672
+      - 5672:5672
+#     networks:
+#       - amqp_net
+
+#   service-a:
+#     build:
+#       context: .
+#       dockerfile: ./dockerfile
+#     depends_on:
+#       - amqp
+#     volumes:
+#       - ./lib:/app/lib/
+#       - ./test:/app/test/
+#     networks:
+#       - amqp_net
+#     environment:
+#       - HOST=amqp
+#       - USERNAME=guest
+#       - PASSWORD=guest
+#     command: sh
+
+# networks:
+#   amqp_net:
+#     driver: bridge
