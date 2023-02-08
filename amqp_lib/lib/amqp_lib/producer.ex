@@ -74,17 +74,17 @@ defmodule AMQPLib.Producer do
       ) do
     Logger.info("Received reply #{inspect(payload)} - #{inspect(meta)}")
 
-    new_state =
+    new_awaiting_replies =
       case Map.pop(state.awaiting_replies, correlation_id) do
         {nil, ^state} ->
           Logger.error("Unexpected reply received, correlation id: #{inspect(correlation_id)}")
           state
 
-        {from, new_state} ->
+        {from, new_awaiting_replies} ->
           GenServer.reply(from, {:ok, payload, meta})
-          new_state
+          new_awaiting_replies
       end
 
-    {:noreply, new_state}
+    {:noreply, %{state | awaiting_replies: new_awaiting_replies}}
   end
 end
