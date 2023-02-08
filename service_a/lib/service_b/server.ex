@@ -1,9 +1,9 @@
-defmodule ServiceA.Server do
+defmodule ServiceB.Server do
   use GenServer
 
   @spec compute(non_neg_integer()) :: {:ok, non_neg_integer()}
   def compute(id) do
-    GenServer.call({:global, {:server_a, id}}, :compute)
+    GenServer.call({:global, {:server_b, id}}, :compute)
   end
 
   @spec child_spec(Keyword.t()) :: Supervisor.child_spec()
@@ -18,7 +18,7 @@ defmodule ServiceA.Server do
   end
 
   def start_link(id) do
-    GenServer.start_link(__MODULE__, [id], name: {:global, {:server_a, id}})
+    GenServer.start_link(__MODULE__, [id], name: {:global, {:server_b, id}})
   end
 
   @impl GenServer
@@ -28,8 +28,12 @@ defmodule ServiceA.Server do
 
   @impl GenServer
   def handle_call(:compute, _from, state = %{id: id}) do
-    {:ok, reply, _meta} = AMQPLib.Producer.call("amq.direct", "service_b", to_string(id))
-    {result, ""} = Integer.parse(reply)
-    {:reply, {:ok, 1_000_000 + result}, state}
+    if id == 42 do
+      {:ok, reply} = AMQPLib.Producer.call("amq.direct", "service_a", to_string(id))
+      {result, ""} = Integer.parse(reply)
+      {:reply, {:ok, result}, state}
+    else
+      {:reply, {:ok, id}, state}
+    end
   end
 end
