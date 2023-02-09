@@ -11,7 +11,7 @@ defmodule ServiceA.ServerTest do
 
     Support.DistTestHelper.start_child(service_a_node1, ServiceA.Consumer)
 
-    1..20
+    1..30
     |> Enum.to_list()
     |> Enum.each(fn id ->
       Support.DistTestHelper.start_child(service_a_node1, {ServiceA.Server, id: id})
@@ -19,7 +19,7 @@ defmodule ServiceA.ServerTest do
 
     Support.DistTestHelper.start_child(service_a_node2, ServiceA.Consumer)
 
-    21..40
+    31..60
     |> Enum.to_list()
     |> Enum.each(fn id ->
       Support.DistTestHelper.start_child(service_a_node2, {ServiceA.Server, id: id})
@@ -32,7 +32,7 @@ defmodule ServiceA.ServerTest do
 
     Support.DistTestHelper.start_child(service_b_node1, ServiceB.Consumer)
 
-    1..20
+    1..30
     |> Enum.to_list()
     |> Enum.each(fn id ->
       Support.DistTestHelper.start_child(service_b_node1, {ServiceB.Server, id: id})
@@ -40,7 +40,7 @@ defmodule ServiceA.ServerTest do
 
     Support.DistTestHelper.start_child(service_b_node2, ServiceB.Consumer)
 
-    21..40
+    31..60
     |> Enum.to_list()
     |> Enum.each(fn id ->
       Support.DistTestHelper.start_child(service_b_node2, {ServiceB.Server, id: id})
