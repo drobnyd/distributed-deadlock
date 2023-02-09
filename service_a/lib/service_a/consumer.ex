@@ -13,7 +13,7 @@ defmodule ServiceA.Consumer do
   def start_link() do
     GenServer.start_link(
       AMQPLib.Consumer,
-      [{"amq.direct", "service_a", "queue", &handle_message/2}],
+      [{"amq.direct", "service_a", "", &handle_message/2}],
       name: __MODULE__
     )
   end
