@@ -23,7 +23,7 @@ defmodule ServiceB.Consumer do
 
     {id, ""} = Integer.parse(payload)
 
-    Logger.info("Sending to server #{inspect(id)}")
+    Logger.info("#{__MODULE__} Sending to #{ServiceB.Server} #{inspect(id)}")
 
     {:ok, result} = ServiceB.Server.compute(id)
 

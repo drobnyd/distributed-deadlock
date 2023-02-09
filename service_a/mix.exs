@@ -21,7 +21,9 @@ defmodule ServiceA.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:amqp_lib, path: "../amqp_lib"}
+      {:amqp_lib, path: "../amqp_lib"},
+      # TODO only: [:dev, :test]
+      {:local_cluster, "~> 1.2"}
     ]
   end
 end

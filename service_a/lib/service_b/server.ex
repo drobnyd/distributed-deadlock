@@ -1,6 +1,8 @@
 defmodule ServiceB.Server do
   use GenServer
 
+  require Logger
+
   @spec compute(non_neg_integer()) :: {:ok, non_neg_integer()}
   def compute(id) do
     GenServer.call({:global, {:server_b, id}}, :compute)
@@ -28,6 +30,8 @@ defmodule ServiceB.Server do
 
   @impl GenServer
   def handle_call(:compute, _from, state = %{id: id}) do
+    Logger.info("#{__MODULE__} handling #{:compute} with id: #{id}")
+
     if id == 42 do
       {:ok, reply} = AMQPLib.Producer.call("amq.direct", "service_a", to_string(id))
       {result, ""} = Integer.parse(reply)
