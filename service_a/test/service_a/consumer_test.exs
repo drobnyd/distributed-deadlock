@@ -26,8 +26,6 @@ defmodule ServiceA.ConsumerTest do
       start_supervised!({ServiceB.Server, id: id})
       start_supervised!(ServiceB.Consumer)
 
-      expected_reply = to_string(1_000_000 + id)
-
       try do
         AMQPLib.Producer.call("amq.direct", "service_a", to_string(id))
         assert false
