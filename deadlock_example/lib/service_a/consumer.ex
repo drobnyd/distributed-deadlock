@@ -23,7 +23,7 @@ defmodule ServiceA.Consumer do
       "#{node()}:#{inspect(self())}:#{__MODULE__} Received #{inspect(payload)} with meta #{inspect(meta)}"
     )
 
-    id = Protocol.decode_int(payload)
+    id = Proto.decode(payload)
 
     Logger.info(
       "#{node()}:#{inspect(self())}:#{__MODULE__} Sending to #{ServiceA.Server} #{inspect(id)}"
@@ -31,6 +31,6 @@ defmodule ServiceA.Consumer do
 
     {:ok, result} = ServiceA.Server.compute(id)
 
-    {:reply, Protocol.encode(result)}
+    {:reply, Proto.encode(result)}
   end
 end
