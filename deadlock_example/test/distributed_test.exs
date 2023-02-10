@@ -58,7 +58,7 @@ defmodule DistributedTest do
       {:ok, _result} = ServiceA.Api.compute(42)
       assert false
     catch
-      :exit, {:timeout, _} -> assert true
+      :exit, {:timeout, {GenServer, :call, _}} -> assert true
     end
   end
 end

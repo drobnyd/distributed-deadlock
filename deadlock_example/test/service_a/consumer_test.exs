@@ -27,7 +27,7 @@ defmodule ServiceA.ConsumerTest do
         {:ok, _res} = ServiceA.Api.compute(id)
         assert false
       catch
-        :exit, {:timeout, _reason} ->
+        :exit, {:timeout, {GenServer, :call, _}} ->
           assert true
       end
     end
