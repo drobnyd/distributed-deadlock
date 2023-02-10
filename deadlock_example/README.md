@@ -1,4 +1,4 @@
-# ServiceA
+# Distributed Deadlock Example
 
 **TODO: Add description**
 

@@ -1,4 +1,4 @@
-defmodule ServiceA.ServerTest do
+defmodule DistributedTest do
   use ExUnit.Case
 
   setup do
@@ -17,7 +17,7 @@ defmodule ServiceA.ServerTest do
       Support.DistTestHelper.start_child(service_a_node1, {ServiceA.Server, id: id})
     end)
 
-    Support.DistTestHelper.start_child(service_a_node2, ServiceA.Consumer)
+    # Support.DistTestHelper.start_child(service_a_node2, ServiceA.Consumer)
 
     31..60
     |> Enum.to_list()
@@ -38,7 +38,7 @@ defmodule ServiceA.ServerTest do
       Support.DistTestHelper.start_child(service_b_node1, {ServiceB.Server, id: id})
     end)
 
-    Support.DistTestHelper.start_child(service_b_node2, ServiceB.Consumer)
+    # Support.DistTestHelper.start_child(service_b_node2, ServiceB.Consumer)
 
     31..60
     |> Enum.to_list()
@@ -50,14 +50,12 @@ defmodule ServiceA.ServerTest do
   end
 
   test "working scenario" do
-    {:ok, reply, _meta} = AMQPLib.Producer.call("amq.direct", "service_a", "1")
-    {reply_num, ""} = Integer.parse(reply)
-    assert 1_000_001 == reply_num
+    assert {:ok, 1_000_001} = ServiceA.Api.compute(1)
   end
 
   test "deadlock scenario" do
     try do
-      AMQPLib.Producer.call("amq.direct", "service_a", "42")
+      {:ok, _result} = ServiceA.Api.compute(42)
       assert false
     catch
       :exit, {:timeout, _} -> assert true

@@ -3,11 +3,12 @@ defmodule ServiceA.MixProject do
 
   def project do
     [
-      app: :service_a,
+      app: :deadlock_example,
       version: "0.1.0",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       deps: deps()
+      # elixirc_paths: ["lib, test/support"]
     ]
   end
 

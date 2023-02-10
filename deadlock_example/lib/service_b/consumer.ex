@@ -1,4 +1,4 @@
-defmodule ServiceA.Consumer do
+defmodule ServiceB.Consumer do
   require Logger
 
   @spec child_spec(non_neg_integer()) :: Supervisor.child_spec()
@@ -13,19 +13,19 @@ defmodule ServiceA.Consumer do
   def start_link() do
     GenServer.start_link(
       AMQPLib.Consumer,
-      [{"amq.direct", "service_a", "", &handle_message/2}],
+      [{"amq.direct", "service_b", "", &handle_message/2}],
       name: __MODULE__
     )
   end
 
   defp handle_message(payload, meta) do
-    Logger.info("#{__MODULE__} Received #{inspect(payload)} with meta #{inspect(meta)}")
+    Logger.info("#{node()}:#{inspect(self())}:#{__MODULE__} Received #{inspect(payload)} with meta #{inspect(meta)}")
 
     {id, ""} = Integer.parse(payload)
 
-    Logger.info("#{__MODULE__} Sending to #{ServiceA.Server} #{inspect(id)}")
+    Logger.info("#{node()}:#{inspect(self())}:#{__MODULE__} Sending to #{ServiceB.Server} #{inspect(id)}")
 
-    {:ok, result} = ServiceA.Server.compute(id)
+    {:ok, result} = ServiceB.Server.compute(id)
 
     {:reply, to_string(result)}
   end

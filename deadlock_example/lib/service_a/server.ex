@@ -30,10 +30,9 @@ defmodule ServiceA.Server do
 
   @impl GenServer
   def handle_call(:compute, _from, state = %{id: id}) do
-    Logger.info("#{__MODULE__} handling #{:compute} with id: #{id}")
+    Logger.info("#{node()}:#{inspect(self())}:#{__MODULE__} handling #{:compute} with id: #{id}")
 
-    {:ok, reply, _meta} = AMQPLib.Producer.call("amq.direct", "service_b", to_string(id))
-    {result, ""} = Integer.parse(reply)
+    {:ok, result} = ServiceB.Api.compute(id)
     {:reply, {:ok, 1_000_000 + result}, state}
   end
 end
