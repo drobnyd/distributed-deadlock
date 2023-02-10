@@ -11,7 +11,6 @@ defmodule ServiceA.ConsumerTest do
       start_supervised!({ServiceB.Server, id: id})
       start_supervised!(ServiceB.Consumer)
 
-
       assert {:ok, 1_000_000 + id} == ServiceA.Api.compute(id)
     end
 

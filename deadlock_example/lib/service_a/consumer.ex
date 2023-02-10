@@ -19,15 +19,18 @@ defmodule ServiceA.Consumer do
   end
 
   defp handle_message(payload, meta) do
+    Logger.info(
+      "#{node()}:#{inspect(self())}:#{__MODULE__} Received #{inspect(payload)} with meta #{inspect(meta)}"
+    )
 
-    Logger.info("#{node()}:#{inspect(self())}:#{__MODULE__} Received #{inspect(payload)} with meta #{inspect(meta)}")
+    id = Protocol.decode_int(payload)
 
-    {id, ""} = Integer.parse(payload)
-
-    Logger.info("#{node()}:#{inspect(self())}:#{__MODULE__} Sending to #{ServiceA.Server} #{inspect(id)}")
+    Logger.info(
+      "#{node()}:#{inspect(self())}:#{__MODULE__} Sending to #{ServiceA.Server} #{inspect(id)}"
+    )
 
     {:ok, result} = ServiceA.Server.compute(id)
 
-    {:reply, to_string(result)}
+    {:reply, Protocol.encode(result)}
   end
 end

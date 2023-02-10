@@ -11,6 +11,5 @@ defmodule ServiceB.ConsumerTest do
 
       assert {:ok, id} == ServiceB.Api.compute(id)
     end
-
   end
 end
