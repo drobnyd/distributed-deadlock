@@ -7,7 +7,11 @@ defmodule ServiceA.MixProject do
       version: "0.1.0",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      dialyzer: [
+        plt_add_apps: [:deadlock_example],
+        flags: [:error_handling, :race_conditions]
+      ]
       # elixirc_paths: ["lib, test/support"]
     ]
   end
@@ -24,7 +28,8 @@ defmodule ServiceA.MixProject do
     [
       {:amqp_lib, path: "../amqp_lib"},
       # TODO only: [:dev, :test]
-      {:local_cluster, "~> 1.2"}
+      {:local_cluster, "~> 1.2"},
+      {:dialyxir, "~> 1.2.0", runtime: false},
     ]
   end
 end
