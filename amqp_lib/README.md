@@ -14,3 +14,16 @@ def deps do
   ]
 end
 ```
+
+## Local Testing
+
+To run tests locally start the broker by running
+```console
+$ docker-compose up -d amqp
+```
+
+from the root of the repository and then run the tests by:
+
+```console
+$ mix test
+```
