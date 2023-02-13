@@ -1,22 +1,33 @@
 defmodule AMQPLib.Consumer do
+  @moduledoc """
+  Consumer process that processes incoming messages and publishes results.
+  """
   use GenServer
   use AMQP
 
   require Logger
 
-  def start_link(exchange, routing_key, queue, recv_callback) do
-    GenServer.start_link(__MODULE__, [{exchange, routing_key, queue, recv_callback}],
-      name: String.to_atom(queue)
-    )
+  @doc """
+  Consumer declares a queue, binds it to the `exchange` with provided `routing_key`.
+  When message is received, `handler_fun` gets called and the result is sent back through
+  the default exchange with `reply_to` routing key that is provided in the original message.
+
+  If the `exchange` parameter is an empty string the direct exchange will be used (equivalent to `"amqp.direct"`).
+  If the `queue` parameter is an empty string an auto-generated queue name will be used.
+  """
+  @spec start_link(
+          {Keyword.t(), String.t(), String.t(), String.t(),
+           (binary(), map() -> {:reply, binary()})}
+        ) :: GenServer.on_start()
+  def start_link({connection_params, exchange, routing_key, queue, handler_fun}) do
+    GenServer.start_link(__MODULE__, [
+      {connection_params, exchange, routing_key, queue, handler_fun}
+    ])
   end
 
   @impl GenServer
-  def init([{exchange, routing_key, queue, recv_callback}]) do
-    host = System.fetch_env!("HOST")
-    username = System.fetch_env!("USERNAME")
-    password = System.fetch_env!("PASSWORD")
-
-    {:ok, connection} = Connection.open(host: host, username: username, password: password)
+  def init([{connection_params, exchange, routing_key, queue, handler_fun}]) do
+    {:ok, connection} = Connection.open(connection_params)
     {:ok, channel} = AMQP.Channel.open(connection)
     {:ok, _} = AMQP.Queue.declare(channel, queue)
     :ok = AMQP.Queue.bind(channel, queue, exchange, routing_key: routing_key)
@@ -24,10 +35,10 @@ defmodule AMQPLib.Consumer do
     {:ok, tag} = AMQP.Basic.consume(channel, queue, nil, no_ack: true)
 
     Logger.info(
-      "Consumer start consuming from queue: #{inspect(queue)} - consumer tag: #{inspect(tag)}"
+      "Consumer started consuming from queue: #{inspect(queue)}. Consumer tag: #{inspect(tag)}"
     )
 
-    {:ok, %{channel: channel, consumer_tag: tag, recv_callback: recv_callback}}
+    {:ok, %{channel: channel, consumer_tag: tag, handler_fun: handler_fun}}
   end
 
   @impl GenServer
@@ -37,7 +48,7 @@ defmodule AMQPLib.Consumer do
   def handle_info({:basic_deliver, payload, meta}, state) do
     :ok =
       payload
-      |> state.recv_callback.(meta)
+      |> state.handler_fun.(meta)
       |> reply(meta, state)
 
     {:noreply, state}

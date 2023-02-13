@@ -1,9 +1,18 @@
 defmodule AMQPLib.Producer do
+  @moduledoc """
+  Process for producing messages over AMQP..
+
+  Note that only one `AMQP.Producer` should be started per erlang node.
+  """
   use GenServer
   use AMQP
 
   require Logger
 
+  @doc """
+  Synchronous producer call.
+  Blocks the caller until a reply is received on the reply queue (or until the call times out).
+  """
   @spec call(String.t(), String.t(), binary()) ::
           {:ok, payload :: binary(), meta :: map()} | {:error, term()}
   def call(exchange, routing_key, payload) do
@@ -13,17 +22,14 @@ defmodule AMQPLib.Producer do
     )
   end
 
-  def start_link(_) do
-    GenServer.start_link(__MODULE__, [], name: __MODULE__)
+  @spec start_link(Keyword.t()) :: Supervisor.start_link()
+  def start_link(connection_params) do
+    GenServer.start_link(__MODULE__, [connection_params], name: __MODULE__)
   end
 
   @impl GenServer
-  def init(_) do
-    host = System.fetch_env!("HOST")
-    username = System.fetch_env!("USERNAME")
-    password = System.fetch_env!("PASSWORD")
-
-    {:ok, connection} = Connection.open(host: host, username: username, password: password)
+  def init(connection_params) do
+    {:ok, connection} = Connection.open(connection_params)
     {:ok, channel} = Channel.open(connection)
 
     {:ok, %{queue: reply_queue_name}} =

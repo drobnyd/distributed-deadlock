@@ -1,11 +1,11 @@
 # AmqpLib
 
-**TODO: Add description**
+Simple library that makes easier creating producer and consumer processes for AMQP.
+The library provides an abstraction layer over [amqp](https://github.com/pma/amqp).
+
+Currently only supports synchronous producer calls and doesn't really handle errors but rather crashes. Also, each consumer and producer creates a new TLS connection to the broker which isn't very efficient.
 
 ## Installation
-
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `amqp_lib` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
@@ -14,8 +14,3 @@ def deps do
   ]
 end
 ```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/amqp_lib>.
-
