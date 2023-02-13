@@ -29,7 +29,7 @@ defmodule ServiceA.MixProject do
       {:amqp_lib, path: "../amqp_lib"},
       # TODO only: [:dev, :test]
       {:local_cluster, "~> 1.2"},
-      {:dialyxir, "~> 1.2.0", runtime: false},
+      {:dialyxir, "~> 1.2.0", runtime: false}
     ]
   end
 end
