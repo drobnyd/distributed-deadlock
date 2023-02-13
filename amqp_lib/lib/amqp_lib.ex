@@ -1,13 +1,17 @@
-defmodule AmqpLib do
+defmodule AMQPLib do
   @moduledoc """
-  Documentation for `AmqpLib`.
+  Library for publishing and consuming messages through AMQP message broker.
   """
-  # use Application
 
-  # @impl Application
-  # def start(_type, _args) do
-  #   children = []
-  #   opts = [strategy: :one_for_one, max_restarts: 30, max_seconds: 1]
-  #   Supervisor.start_link(children, opts)
-  # end
+  @typedoc """
+  AMQP Connection parameters are a keyword list that includes the following keys:
+  * `host`
+  * `username`
+  * `password`
+  """
+  @type connection_params :: [
+    {:host, String.t()}
+    | {:username, String.t()}
+    | {:password, String.t()}
+  ]
 end

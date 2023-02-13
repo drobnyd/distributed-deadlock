@@ -16,7 +16,7 @@ defmodule AMQPLib.Consumer do
   If the `queue` parameter is an empty string an auto-generated queue name will be used.
   """
   @spec start_link(
-          {Keyword.t(), String.t(), String.t(), String.t(),
+          {AMQPLib.connection_params(), String.t(), String.t(), String.t(),
            (binary(), map() -> {:reply, binary()})}
         ) :: GenServer.on_start()
   def start_link({connection_params, exchange, routing_key, queue, handler_fun}) do

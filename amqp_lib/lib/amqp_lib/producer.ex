@@ -22,7 +22,7 @@ defmodule AMQPLib.Producer do
     )
   end
 
-  @spec start_link(Keyword.t()) :: Supervisor.start_link()
+  @spec start_link(AMQPLib.connection_params()) :: GenServer.on_start()
   def start_link(connection_params) do
     GenServer.start_link(__MODULE__, [connection_params], name: __MODULE__)
   end

@@ -21,7 +21,8 @@ defmodule AmqpLib.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:amqp, "~> 3.2"}
+      {:amqp, "~> 3.2"},
+      {:dialyxir, "~> 1.2.0", runtime: false}
     ]
   end
 end
