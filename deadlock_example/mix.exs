@@ -9,7 +9,7 @@ defmodule ServiceA.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       dialyzer: [
-        plt_add_apps: [:deadlock_example],
+        plt_add_apps: [:deadlock_example, :amqp_lib],
         flags: [:error_handling, :race_conditions]
       ]
       # elixirc_paths: ["lib, test/support"]
