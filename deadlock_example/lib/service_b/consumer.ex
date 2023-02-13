@@ -14,7 +14,7 @@ defmodule ServiceB.Consumer do
   def start_link(connection_params) do
     GenServer.start_link(
       AMQPLib.Consumer,
-      [{connection_params, "amq.direct", "service_b", "service_b", &handle_message/2}],
+      [{connection_params, "amq.direct", "service_b.compute", "service_b.compute", &handle_message/2}],
       name: __MODULE__
     )
   end
