@@ -1,19 +1,20 @@
 defmodule ServiceA.Consumer do
   require Logger
 
-  @spec child_spec(non_neg_integer()) :: Supervisor.child_spec()
-  def child_spec(_) do
+  @spec child_spec(AMQPLib.connection_params()) :: Supervisor.child_spec()
+  def child_spec(connection_params) do
     %{
       id: __MODULE__,
-      start: {__MODULE__, :start_link, []},
+      start: {__MODULE__, :start_link, [connection_params]},
       type: :worker
     }
   end
 
-  def start_link() do
+  @spec start_link(AMQPLib.connection_params()) :: GenServer.on_start()
+  def start_link(connection_params) do
     GenServer.start_link(
       AMQPLib.Consumer,
-      [{"amq.direct", "service_a", "", &handle_message/2}],
+      [{connection_params, "amq.direct", "service_a", "service_a", &handle_message/2}],
       name: __MODULE__
     )
   end

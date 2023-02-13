@@ -2,14 +2,23 @@ defmodule DistributedTest do
   use ExUnit.Case
 
   setup do
-    start_supervised!(AMQPLib.Producer)
+    username = Application.fetch_env!(:amqp_lib, :username)
+    password = Application.fetch_env!(:amqp_lib, :password)
+    host = Application.fetch_env!(:amqp_lib, :host)
+    connection_params = [username: username, password: password, host: host]
 
-    [service_a_node1, service_a_node2] = LocalCluster.start_nodes("service-a", 2)
+    start_supervised!({AMQPLib.Producer, connection_params})
+
+    [service_a_node1, service_a_node2] =
+      LocalCluster.start_nodes("service-a", 2,
+        applications:
+          Enum.map(Application.loaded_applications(), fn {appl, _, _} -> appl end) -- [:dialyxir]
+      )
 
     Support.DistTestHelper.setup_node(service_a_node1)
     Support.DistTestHelper.setup_node(service_a_node2)
 
-    Support.DistTestHelper.start_child(service_a_node1, ServiceA.Consumer)
+    Support.DistTestHelper.start_child(service_a_node1, {ServiceA.Consumer, connection_params})
 
     1..30
     |> Enum.to_list()
@@ -17,7 +26,7 @@ defmodule DistributedTest do
       Support.DistTestHelper.start_child(service_a_node1, {ServiceA.Server, id: id})
     end)
 
-    # Support.DistTestHelper.start_child(service_a_node2, ServiceA.Consumer)
+    Support.DistTestHelper.start_child(service_a_node2, {ServiceA.Consumer, connection_params})
 
     31..60
     |> Enum.to_list()
@@ -25,12 +34,16 @@ defmodule DistributedTest do
       Support.DistTestHelper.start_child(service_a_node2, {ServiceA.Server, id: id})
     end)
 
-    [service_b_node1, service_b_node2] = LocalCluster.start_nodes("service-b", 2)
+    [service_b_node1, service_b_node2] =
+      LocalCluster.start_nodes("service-b", 2,
+        applications:
+          Enum.map(Application.loaded_applications(), fn {appl, _, _} -> appl end) -- [:dialyxir]
+      )
 
     Support.DistTestHelper.setup_node(service_b_node1)
     Support.DistTestHelper.setup_node(service_b_node2)
 
-    Support.DistTestHelper.start_child(service_b_node1, ServiceB.Consumer)
+    Support.DistTestHelper.start_child(service_b_node1, {ServiceB.Consumer, connection_params})
 
     1..30
     |> Enum.to_list()
@@ -38,7 +51,7 @@ defmodule DistributedTest do
       Support.DistTestHelper.start_child(service_b_node1, {ServiceB.Server, id: id})
     end)
 
-    # Support.DistTestHelper.start_child(service_b_node2, ServiceB.Consumer)
+    Support.DistTestHelper.start_child(service_b_node2, {ServiceB.Consumer, connection_params})
 
     31..60
     |> Enum.to_list()

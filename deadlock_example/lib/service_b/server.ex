@@ -19,6 +19,7 @@ defmodule ServiceB.Server do
     }
   end
 
+  @spec start_link(non_neg_integer()) :: GenServer.on_start()
   def start_link(id) do
     GenServer.start_link(__MODULE__, [id], name: {:global, {:server_b, id}})
   end
