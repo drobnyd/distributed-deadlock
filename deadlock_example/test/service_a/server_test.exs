@@ -18,7 +18,8 @@ defmodule ServiceA.ServerTest do
       id = 42
       start_supervised!(AMQPLib.Producer)
 
-      start_supervised!({ServiceA.Server, id: id})
+      pid = start_supervised!({ServiceA.Server, id: id})
+      ref = Process.monitor(pid)
       start_supervised!(ServiceA.Consumer)
       start_supervised!({ServiceB.Server, id: id})
       start_supervised!(ServiceB.Consumer)
@@ -30,6 +31,9 @@ defmodule ServiceA.ServerTest do
         :exit, {:timeout, {GenServer, :call, _}} ->
           assert true
       end
+
+      bin_req =  Proto.encode(42)
+      assert_receive({:DOWN, ^ref, :process, ^pid, {:timeout, {GenServer, :call, [AMQPLib.Producer, {:amqp_call, "amq.direct", "service_b.compute", ^bin_req}, 5000]}}}, 100)
     end
   end
 end
