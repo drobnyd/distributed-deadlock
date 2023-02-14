@@ -36,4 +36,10 @@ defmodule ServiceA.Server do
     {:ok, result} = ServiceB.Api.compute(id)
     {:reply, {:ok, 1_000_000 + result}, state}
   end
+
+  @impl GenServer
+  def terminate(_reason, _state) do
+    Logger.info("Process #{inspect({__MODULE__, self()})} terminating")
+    :ok
+  end
 end
