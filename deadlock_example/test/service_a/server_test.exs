@@ -1,32 +1,43 @@
 defmodule ServiceA.ServerTest do
   use ExUnit.Case
 
+  setup do
+    username = Application.fetch_env!(:amqp_lib, :username)
+    password = Application.fetch_env!(:amqp_lib, :password)
+    host = Application.fetch_env!(:amqp_lib, :host)
+    connection_params = [username: username, password: password, host: host]
+
+    {:ok, %{connection_params: connection_params}}
+  end
+
   describe "RPC request to compute" do
-    test "id 1 works fine" do
+    test "id 1 works fine", %{connection_params: connection_params} do
       id = 1
-      start_supervised!(AMQPLib.Producer)
+      start_supervised!({AMQPLib.Producer, connection_params})
 
       start_supervised!({ServiceA.Server, id: id})
-      start_supervised!(ServiceA.Consumer)
+      start_supervised!({ServiceA.Consumer, connection_params})
       start_supervised!({ServiceB.Server, id: id})
-      start_supervised!(ServiceB.Consumer)
+      start_supervised!({ServiceB.Consumer, connection_params})
 
       assert {:ok, 1_000_000 + id} == ServiceA.Server.compute(id)
     end
 
-    test "id 42 has a bug and deadlocks until timeouts are triggered" do
+    test "id 42 has a bug and deadlocks until timeouts are triggered", %{
+      connection_params: connection_params
+    } do
       id = 42
-      pid_producer = start_supervised!(AMQPLib.Producer)
+      pid_producer = start_supervised!({AMQPLib.Producer, connection_params})
 
       pid_server_a = start_supervised!({ServiceA.Server, id: id})
       ref_server_a = Process.monitor(pid_server_a)
 
-      pid_consumer_a = start_supervised!(ServiceA.Consumer)
+      pid_consumer_a = start_supervised!({ServiceA.Consumer, connection_params})
 
       pid_server_b = start_supervised!({ServiceB.Server, id: id})
       ref_server_b = Process.monitor(pid_server_b)
 
-      pid_consumer_b = start_supervised!(ServiceB.Consumer)
+      pid_consumer_b = start_supervised!({ServiceB.Consumer, connection_params})
 
       bin_req = Proto.encode(42)
 
