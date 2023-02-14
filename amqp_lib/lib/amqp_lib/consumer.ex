@@ -27,6 +27,8 @@ defmodule AMQPLib.Consumer do
 
   @impl GenServer
   def init([{connection_params, exchange, routing_key, queue, handler_fun}]) do
+    Process.flag(:trap_exit, true)
+
     {:ok, connection} = Connection.open(connection_params)
     {:ok, channel} = AMQP.Channel.open(connection)
     {:ok, _} = AMQP.Queue.declare(channel, queue)
