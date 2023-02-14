@@ -78,7 +78,11 @@ defmodule DistributedTest do
       {:ok, _result} = ServiceA.Api.compute(42)
       assert false
     catch
-      :exit, {:timeout, {GenServer, :call, _}} -> assert true
+      :exit,
+      {:timeout,
+       {GenServer, :call,
+        [AMQPLib.Producer, {:amqp_call, "amq.direct", "service_a.compute", bin_req}, 5000]}} ->
+        assert bin_req == Proto.encode(42)
     end
   end
 end
