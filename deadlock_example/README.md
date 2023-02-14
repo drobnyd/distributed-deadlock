@@ -28,7 +28,7 @@ The `AMQP.Producer` process doesn't timeout - it only dispatches messages to the
 
 ## Setup and Caveats
 
-The example in [distributed_test.exs](./dist_deadlock_example/deadlock_example/test/distributed_test.exs) sets up a local erlang cluster which mimics micro services setup but enables us to set up tests more easily. 
+The example in [distributed_test.exs](./test/distributed_test.exs) sets up a local erlang cluster which mimics micro services setup but enables us to set up tests more easily. 
 The cluster has 5 nodes - 2 replicas of `ServiceA`, 2 replicas of `ServiceB` and the test manager. 
 
 In a proper micro services setup we would only cluster erlang nodes of a given service together as opposed to our erlang cluster where all the five nodes are connected to each other. 
