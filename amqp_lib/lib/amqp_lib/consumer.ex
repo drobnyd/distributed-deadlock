@@ -38,7 +38,7 @@ defmodule AMQPLib.Consumer do
       "Consumer started consuming from queue: #{inspect(queue)}. Consumer tag: #{inspect(tag)}"
     )
 
-    {:ok, %{channel: channel, consumer_tag: tag, handler_fun: handler_fun}}
+    {:ok, %{channel: channel, connection: connection, consumer_tag: tag, handler_fun: handler_fun}}
   end
 
   @impl GenServer
@@ -52,6 +52,15 @@ defmodule AMQPLib.Consumer do
       |> reply(meta, state)
 
     {:noreply, state}
+  end
+
+  @impl GenServer
+  def terminate(_reason, %{channel: channel, connection: connection, consumer_tag: tag}) do
+    AMQP.Basic.cancel(channel, tag)
+    AMQP.Channel.close(channel)
+    AMQP.Connection.close(connection)
+    Logger.info("Consumer #{inspect({__MODULE__, self()})} terminating")
+    :ok
   end
 
   defp reply(
