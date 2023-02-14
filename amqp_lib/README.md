@@ -22,7 +22,7 @@ To run tests locally start the broker by running
 $ docker-compose up -d amqp
 ```
 
-from the root of the repository and then run the tests by:
+Assuming you have Elixir installed locally, you can execute the tests from the root of the project by running:
 
 ```console
 $ mix test
