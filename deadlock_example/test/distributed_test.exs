@@ -1,4 +1,11 @@
 defmodule DistributedTest do
+  @moduledoc """
+  Test suite integrating `ServiceA`, `ServiceB` and `amqp`.
+  The `LocalCluster` setup imitates micro services.
+
+  Note that `docker-compose up -d amqp` needs to be run prior to
+  running the tests.
+  """
   use ExUnit.Case
 
   setup do
